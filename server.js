@@ -6,6 +6,7 @@ const liveUserCounter = require('./server/services/liveUserCounter');
 const CovidDataService = require('./server/services/data_service');
 const mongo = require('mongodb').MongoClient
 require('dotenv').config();
+const newrelic = require('newrelic');
 
 const app = express(),
   server = require('http').createServer(app),
@@ -24,8 +25,10 @@ const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/covid19'
 mongo.connect(uri, (err, db) => {
   if (err) {
     console.error(err)
+    newrelic.noticeError(err)
     return
   }
+
   let covidDataService = CovidDataService(db)
   const data_api = Data_Api(covidDataService)
   Routes(app, data_api)

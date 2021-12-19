@@ -1,16 +1,22 @@
 const GeoJsonService = require('../services/geojson_service');
+const newrelic = require('newrelic');
 module.exports = (covidData) => {
 
 
     const latestStatistics = async (req, res) => {
         try{
+        newrelic.startWebTransaction('/api/latest-stats', async () => {
+            var transaction = newrelic.getTransaction()
         res.json({
             data:await covidData.getLatestStats(),
             source:'scraped from sacoronavirus.co.za',
             status:'success'
         })
+        transaction.end()
+    })
     }catch(err){
         console.log(err.stack)
+        newrelic.noticeError(err.stack)
     }
     }
 
