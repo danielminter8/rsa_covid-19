@@ -16,11 +16,16 @@ module.exports = (db) => {
     }
 
     const getCovidProvincialData = async () => {
+        const newrelic = require('newrelic');
         let source = 'https://raw.githubusercontent.com/dsfsi/covid19za/master/data/covid19za_provincial_cumulative_timeline_confirmed.csv'
+        try {
         return axios.get(source).then(async response => {
                 let csvData = await neatCsv(response.data)
                 return csvData
             })
+        }catch(err){
+            newrelic.noticeError(err)
+        }
     }
 
     const getLatestIncrease = async () => {
